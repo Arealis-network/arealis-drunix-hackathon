@@ -15,13 +15,13 @@ import (
 )
 
 const (
-	mspID        = "Org1MSP"
-	cryptoPath   = "../drunix-network/test-network/organizations/peerOrganizations/org1.example.com"
-	certPath     = cryptoPath + "/users/User1@org1.example.com/msp/signcerts"
-	keyPath      = cryptoPath + "/users/User1@org1.example.com/msp/keystore"
-	tlsCertPath  = cryptoPath + "/peers/peer0.org1.example.com/tls/ca.crt"
-	peerEndpoint = "dns:///localhost:7051"
-	gatewayPeer  = "peer0.org1.example.com"
+    mspID        = "Org1MSP"
+    cryptoPath   = "../drunix/drunix-network/test-network/organizations/peerOrganizations/org1.example.com"
+    certPath     = cryptoPath + "/users/User1@org1.example.com/msp/signcerts"
+    keyPath      = cryptoPath + "/users/User1@org1.example.com/msp/keystore"
+    tlsCertPath  = cryptoPath + "/peers/peer0.org1.example.com/tls/ca.crt"
+    peerEndpoint = "dns:///localhost:7051"
+    gatewayPeer  = "peer0.org1.example.com"
 )
 
 func main() {
