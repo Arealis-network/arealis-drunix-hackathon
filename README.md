@@ -1,3 +1,4 @@
+````markdown
 # Drunix-Synapse
 
 ### Asynchronous CloudEvents Choreography & Concurrency Ingress Network for Agentic RWA Tokenization
@@ -67,8 +68,9 @@ Synapse provides a coordination layer between these autonomous agents and Drunix
         │          ↓              │
         │  Authoritative Ledger   │
         └─────────────────────────┘
+````
 
-Responsibility split
+### Responsibility split
 
 | Component     | Responsibility                                        |
 | ------------- | ----------------------------------------------------- |
@@ -77,59 +79,79 @@ Responsibility split
 | Drunix        | Execute transactions and maintain authoritative state |
 | RWA Chaincode | Enforce valid asset state transitions                 |
 
-Synapse does not replace Drunix's transaction validation or ledger.
+Synapse does **not** replace Drunix's transaction validation or ledger.
 
-Prototype Flow
+---
+
+## Prototype Flow
 
 The current prototype demonstrates an RWA asset moving from:
 
+```text
 AVAILABLE → LOCKED
-1. Agent events arrive
+```
+
+### 1. Agent events arrive
 
 Three CloudEvents are produced for the same transaction:
 
+```text
 asset.valuation.completed
 asset.compliance.completed
 asset.funds.verified
+```
 
 All events contain:
 
+```text
 Correlation ID: txn-001
 Asset ID:       SOLAR-001
-2. Synapse correlates the events
+```
+
+### 2. Synapse correlates the events
 
 Synapse stores events by correlation ID and waits until all required event types are present.
 
+```text
 Valuation  ──┐
 Compliance ──┼──> Correlation Barrier
 Treasury   ──┘
                   │
                   ▼
              Barrier Ready
-3. A deterministic transaction intent is created
+```
+
+### 3. A deterministic transaction intent is created
 
 Once the barrier is satisfied:
 
+```text
 Correlation ID: txn-001
 Asset ID:       SOLAR-001
 Action:         LOCK_ASSET
-4. Asset-aware sequencing
+```
+
+### 4. Asset-aware sequencing
 
 The transaction is placed into a queue associated with the affected asset.
 
 This allows transactions affecting the same asset/state key to be ordered while keeping independent asset queues separate.
 
-The goal is to reduce avoidable contention, not to bypass Drunix's validation.
+The goal is to **reduce avoidable contention**, not to bypass Drunix's validation.
 
-5. Synapse submits the transaction to Drunix
+### 5. Synapse submits the transaction to Drunix
 
 Drunix receives the deterministic transaction intent and executes the RWA chaincode:
 
+```text
 LockAsset("SOLAR-001")
-6. Drunix becomes the source of truth
+```
+
+### 6. Drunix becomes the source of truth
 
 The final state is read back from Drunix:
 
+```json
 {
   "id": "SOLAR-001",
   "owner": "issuer-001",
@@ -138,24 +160,32 @@ The final state is read back from Drunix:
   "status": "LOCKED",
   "settlement_status": "PENDING"
 }
-What the Prototype Demonstrates
- CloudEvents ingestion and parsing
- Agent event normalization
- Correlation using transaction IDs
- Multi-agent correlation barrier
- Deterministic transaction intent generation
- Asset-aware transaction sequencing
- Custom RWA smart contract on Drunix
- Real transaction submission to Drunix
- Authoritative ledger state transition
- Reading the resulting state back from Drunix
+```
 
-This is intentionally a small architectural proof-of-concept, rather than a production deployment.
+---
 
-Example
+## What the Prototype Demonstrates
+
+* [x] CloudEvents ingestion and parsing
+* [x] Agent event normalization
+* [x] Correlation using transaction IDs
+* [x] Multi-agent correlation barrier
+* [x] Deterministic transaction intent generation
+* [x] Asset-aware transaction sequencing
+* [x] Custom RWA smart contract on Drunix
+* [x] Real transaction submission to Drunix
+* [x] Authoritative ledger state transition
+* [x] Reading the resulting state back from Drunix
+
+This is intentionally a **small architectural proof-of-concept**, rather than a production deployment.
+
+---
+
+## Example
 
 Three agents independently produce:
 
+```text
 Valuation Agent
     ↓
 asset.valuation.completed
@@ -167,9 +197,11 @@ asset.compliance.completed
 Treasury Agent
     ↓
 asset.funds.verified
+```
 
 Synapse correlates them:
 
+```text
 txn-001
 SOLAR-001
     │
@@ -187,7 +219,13 @@ Drunix
     │
     ▼
 SOLAR-001 = LOCKED
-Project Structure
+```
+
+---
+
+## Project Structure
+
+```text
 arealis-drunix-hackathon/
 │
 ├── architecture/
@@ -237,33 +275,49 @@ arealis-drunix-hackathon/
     └── sequencer/
         ├── sequencer.go
         └── sequencer_test.go
-Running the Prototype
-Prerequisites
-Go 1.25+
-Docker
-Running Drunix test network
-Drunix channel and RWA chaincode deployed
-Start the Drunix network
+```
+
+---
+
+## Running the Prototype
+
+### Prerequisites
+
+* Go 1.25+
+* Docker
+* Running Drunix test network
+* Drunix channel and RWA chaincode deployed
+
+### Start the Drunix network
 
 From the Drunix test-network directory:
 
+```bash
 ./network.sh up createChannel -c mychannel
-Deploy the RWA chaincode
+```
+
+### Deploy the RWA chaincode
 
 From the Drunix test-network directory:
 
+```bash
 ./network.sh deployCC \
   -ccn rwa \
   -ccp ../../../arealis-drunix-hackathon/chaincode/rwa \
   -ccl go
-Run the Synapse demo
+```
+
+### Run the Synapse demo
 
 From the project root:
 
+```bash
 go run ./cmd/demo
+```
 
 Expected flow:
 
+```text
 Starting Synapse demo...
 
 Connecting to Drunix...
@@ -293,28 +347,35 @@ Transaction committed successfully!
 
 Final Drunix ledger state:
 SOLAR-001 → LOCKED
-Design Principle
+```
+
+---
+
+## Design Principle
 
 The key design principle is:
 
-Synapse coordinates agent activity; Drunix owns financial state.
+> **Synapse coordinates agent activity; Drunix owns financial state.**
 
 Synapse is responsible for handling the asynchronous nature of agent workflows and producing cleaner, deterministic transaction intents.
 
 Drunix remains responsible for:
 
-Smart-contract execution
-Transaction endorsement
-MVCC validation
-Ledger persistence
-Authoritative RWA state
+* Smart-contract execution
+* Transaction endorsement
+* MVCC validation
+* Ledger persistence
+* Authoritative RWA state
 
-Synapse's sequencing is therefore a pre-coordination mechanism, not a replacement for Drunix's concurrency control.
+Synapse's sequencing is therefore a **pre-coordination mechanism**, not a replacement for Drunix's concurrency control.
 
-Current Prototype Scope
+---
+
+## Current Prototype Scope
 
 This repository intentionally demonstrates only the core architectural path:
 
+```text
 Agent Events
      ↓
 Correlation
@@ -326,32 +387,38 @@ Sequencing
 Drunix
      ↓
 RWA State Transition
+```
 
 The prototype does not attempt to implement a production-grade distributed event platform.
 
-Future Hackathon Work
+---
+
+## Future Hackathon Work
 
 Potential extensions during the hackathon include:
 
-Real agent ingress instead of static example events
-Additional RWA lifecycle transitions
-Transfer and settlement workflows
-Conflict-aware scheduling and benchmarking
-Event persistence and TTL handling
-Retry and failure recovery
-Higher-throughput event processing
-Integration with private NPCI/Citi infrastructure
-Production deployment architecture
-Observability and operational tooling
+* Real agent ingress instead of static example events
+* Additional RWA lifecycle transitions
+* Transfer and settlement workflows
+* Conflict-aware scheduling and benchmarking
+* Event persistence and TTL handling
+* Retry and failure recovery
+* Higher-throughput event processing
+* Integration with private NPCI/Citi infrastructure
+* Production deployment architecture
+* Observability and operational tooling
 
 The effectiveness of conflict-aware sequencing would be evaluated through benchmarks rather than assuming that it eliminates MVCC conflicts.
 
-Status
+---
 
-Prototype: Working
+## Status
+
+**Prototype: Working**
 
 The current implementation demonstrates an end-to-end flow where asynchronous agent events are coordinated by Synapse and result in an actual authoritative RWA state transition on Drunix.
 
+```text
 CloudEvents
      ↓
 Synapse
@@ -363,3 +430,4 @@ Sequencer
 Drunix
      ↓
 AVAILABLE → LOCKED
+```
