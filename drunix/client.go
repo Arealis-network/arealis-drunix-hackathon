@@ -92,6 +92,51 @@ func (c *Client) GetAllAssets() ([]byte, error) {
 	return result, nil
 }
 
+func (c *Client) CreateRWAAsset(
+	id string,
+	owner string,
+	totalTokens int64,
+) error {
+	_, err := c.contract.SubmitTransaction(
+		"CreateAsset",
+		id,
+		owner,
+		fmt.Sprintf("%d", totalTokens),
+	)
+
+	if err != nil {
+		return fmt.Errorf("failed to create RWA asset: %w", err)
+	}
+
+	return nil
+}
+
+func (c *Client) GetRWAAsset(id string) ([]byte, error) {
+	result, err := c.contract.EvaluateTransaction(
+		"GetAsset",
+		id,
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to query RWA asset: %w", err)
+	}
+
+	return result, nil
+}
+
+func (c *Client) LockRWAAsset(id string) error {
+	_, err := c.contract.SubmitTransaction(
+		"LockAsset",
+		id,
+	)
+
+	if err != nil {
+		return fmt.Errorf("failed to lock RWA asset: %w", err)
+	}
+
+	return nil
+}
+
 func newGRPCConnection(
 	cryptoPath string,
 	peerEndpoint string,
