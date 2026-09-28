@@ -1,0 +1,42 @@
+[
+  {
+    "specversion": "1.0",
+    "id": "evt-valuation-001",
+    "source": "valuation-agent",
+    "type": "asset.valuation.completed",
+    "time": "2026-09-28T10:00:00Z",
+    "correlationid": "txn-001",
+    "data": {
+      "asset_id": "SOLAR-001",
+      "valuation": 10000000,
+      "status": "APPROVED"
+    }
+  },
+  {
+    "specversion": "1.0",
+    "id": "evt-compliance-001",
+    "source": "compliance-agent",
+    "type": "asset.compliance.completed",
+    "time": "2026-09-28T10:00:02Z",
+    "correlationid": "txn-001",
+    "data": {
+      "asset_id": "SOLAR-001",
+      "status": "APPROVED",
+      "encumbrance": "CLEAR"
+    }
+  },
+  {
+    "specversion": "1.0",
+    "id": "evt-treasury-001",
+    "source": "treasury-agent",
+    "type": "asset.funds.verified",
+    "time": "2026-09-28T10:00:05Z",
+    "correlationid": "txn-001",
+    "data": {
+      "asset_id": "SOLAR-001",
+      "amount": 1000000,
+      "currency": "INR",
+      "status": "AVAILABLE"
+    }
+  }
+]
