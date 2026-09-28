@@ -11,3 +11,7 @@ const (
 	AgentCompliance = "compliance-agent"
 	AgentTreasury   = "treasury-agent"
 )
+
+const (
+	ActionLockAsset = "LOCK_ASSET"
+)

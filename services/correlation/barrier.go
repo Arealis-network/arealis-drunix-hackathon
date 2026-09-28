@@ -45,3 +45,7 @@ func (b *Barrier) IsReady(correlationID string) bool {
 
 	return true
 }
+
+func (b *Barrier) GetEvents(correlationID string) []models.AgentEvent {
+	return b.store.Get(correlationID)
+}
