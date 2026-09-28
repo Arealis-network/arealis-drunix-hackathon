@@ -1,4 +1,3 @@
-````markdown
 # Drunix-Synapse
 
 ### Asynchronous CloudEvents Choreography & Concurrency Ingress Network for Agentic RWA Tokenization
