@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	fmt.Println("Starting Synapse demo...")
+	fmt.Println("Starting Ergos demo...")
 
 	// ------------------------------------------------------------
 	// 1. Connect to Drunix
@@ -51,7 +51,7 @@ func main() {
 	fmt.Println("RWA asset created!")
 
 	// ------------------------------------------------------------
-	// 2. Create Synapse components
+	// 2. Create Ergos components
 	// ------------------------------------------------------------
 
 	store := repository.NewCorrelationStore()
@@ -158,5 +158,5 @@ func main() {
 
 	fmt.Printf("\nFinal Drunix ledger state:\n%s\n", asset)
 
-	fmt.Println("\nSynapse demo completed successfully!")
+	fmt.Println("\nErgos demo completed successfully!")
 }
