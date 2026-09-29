@@ -1,10 +1,10 @@
-# Drunix-Synapse
+# Ergos
 
 ### Asynchronous CloudEvents Choreography & Concurrency Ingress Network for Agentic RWA Tokenization
 
-Drunix-Synapse is an event coordination layer designed to connect asynchronous agent workflows with **Drunix** for Real-World Asset (RWA) tokenization.
+Ergos is an event coordination layer designed to connect asynchronous agent workflows with **Drunix** for Real-World Asset (RWA) tokenization.
 
-Autonomous agents may independently produce valuation, compliance, treasury, and other signals in different formats and at different times. Instead of sending every partial or overlapping request directly to the ledger, Synapse normalizes and correlates these events, waits for the required signals, creates a deterministic transaction intent, and sequences transactions by asset before submitting them to Drunix.
+Autonomous agents may independently produce valuation, compliance, treasury, and other signals in different formats and at different times. Instead of sending every partial or overlapping request directly to the ledger, Ergos normalizes and correlates these events, waits for the required signals, creates a deterministic transaction intent, and sequences transactions by asset before submitting them to Drunix.
 
 **Drunix remains the authoritative system of record** and is responsible for smart-contract execution, endorsement, final validation, and ledger state.
 
@@ -24,7 +24,7 @@ These signals can arrive independently and concurrently.
 
 Directly forwarding every agent request to the ledger can create unnecessary contention when multiple transactions target the same underlying asset or ledger state.
 
-Synapse provides a coordination layer between these autonomous agents and Drunix.
+Ergos provides a coordination layer between these autonomous agents and Drunix.
 
 ---
 
@@ -40,7 +40,7 @@ Synapse provides a coordination layer between these autonomous agents and Drunix
               │ CloudEvents │
               ▼             ▼
         ┌─────────────────────────┐
-        │         SYNAPSE         │
+        │         Ergos         │
         │                         │
         │  CloudEvent Ingress     │
         │          ↓              │
@@ -74,11 +74,11 @@ Synapse provides a coordination layer between these autonomous agents and Drunix
 | Component     | Responsibility                                        |
 | ------------- | ----------------------------------------------------- |
 | Agent Fleet   | Produce independent asynchronous signals              |
-| Synapse       | Parse, correlate, coordinate and sequence events      |
+| Ergos       | Parse, correlate, coordinate and sequence events      |
 | Drunix        | Execute transactions and maintain authoritative state |
 | RWA Chaincode | Enforce valid asset state transitions                 |
 
-Synapse does **not** replace Drunix's transaction validation or ledger.
+Ergos does **not** replace Drunix's transaction validation or ledger.
 
 ---
 
@@ -107,9 +107,9 @@ Correlation ID: txn-001
 Asset ID:       SOLAR-001
 ```
 
-### 2. Synapse correlates the events
+### 2. Ergos correlates the events
 
-Synapse stores events by correlation ID and waits until all required event types are present.
+Ergos stores events by correlation ID and waits until all required event types are present.
 
 ```text
 Valuation  ──┐
@@ -138,7 +138,7 @@ This allows transactions affecting the same asset/state key to be ordered while 
 
 The goal is to **reduce avoidable contention**, not to bypass Drunix's validation.
 
-### 5. Synapse submits the transaction to Drunix
+### 5. Ergos submits the transaction to Drunix
 
 Drunix receives the deterministic transaction intent and executes the RWA chaincode:
 
@@ -198,7 +198,7 @@ Treasury Agent
 asset.funds.verified
 ```
 
-Synapse correlates them:
+Ergos correlates them:
 
 ```text
 txn-001
@@ -306,7 +306,7 @@ From the Drunix test-network directory:
   -ccl go
 ```
 
-### Run the Synapse demo
+### Run the Ergos demo
 
 From the project root:
 
@@ -317,7 +317,7 @@ go run ./cmd/demo
 Expected flow:
 
 ```text
-Starting Synapse demo...
+Starting Ergos demo...
 
 Connecting to Drunix...
 Connected to Drunix successfully!
@@ -354,9 +354,9 @@ SOLAR-001 → LOCKED
 
 The key design principle is:
 
-> **Synapse coordinates agent activity; Drunix owns financial state.**
+> **Ergos coordinates agent activity; Drunix owns financial state.**
 
-Synapse is responsible for handling the asynchronous nature of agent workflows and producing cleaner, deterministic transaction intents.
+Ergos is responsible for handling the asynchronous nature of agent workflows and producing cleaner, deterministic transaction intents.
 
 Drunix remains responsible for:
 
@@ -366,7 +366,7 @@ Drunix remains responsible for:
 * Ledger persistence
 * Authoritative RWA state
 
-Synapse's sequencing is therefore a **pre-coordination mechanism**, not a replacement for Drunix's concurrency control.
+Ergos's sequencing is therefore a **pre-coordination mechanism**, not a replacement for Drunix's concurrency control.
 
 ---
 
@@ -415,12 +415,12 @@ The effectiveness of conflict-aware sequencing would be evaluated through benchm
 
 **Prototype: Working**
 
-The current implementation demonstrates an end-to-end flow where asynchronous agent events are coordinated by Synapse and result in an actual authoritative RWA state transition on Drunix.
+The current implementation demonstrates an end-to-end flow where asynchronous agent events are coordinated by Ergos and result in an actual authoritative RWA state transition on Drunix.
 
 ```text
 CloudEvents
      ↓
-Synapse
+Ergos
      ↓
 Transaction Intent
      ↓
